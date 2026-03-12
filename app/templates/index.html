@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}{{ settings.app_name }}{% endblock %}
+{% block body %}
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero__content">
+        <p class="hero__eyebrow">每日新闻摘要</p>
+        <h1>用 OpenAI 生成过去 24 小时全网热点，整理成一篇真正能读完的中文晨报。</h1>
+        <p class="hero__lede">
+          覆盖美国、中国、国际三大区域，聚焦热点、财经、科技三条主线。支持每日 8:00 美东定时生成、邮件订阅、
+          文章归档和播客式音频同步输出。
+        </p>
+        <div class="hero__actions">
+          <button class="button button--primary" id="generate-button" type="button">实时生成当前版本</button>
+          <a class="button button--secondary" href="#subscribe">订阅每日邮件</a>
+        </div>
+        <p class="hero__note" id="generate-status">点击后会调用 OpenAI 实时生成并归档。</p>
+      </div>
+      <div class="hero__panel">
+        <div class="hero__stats">
+          <div>
+            <strong>30</strong>
+            <span>条重点新闻</span>
+          </div>
+          <div>
+            <strong>08:00 ET</strong>
+            <span>每日定时发送</span>
+          </div>
+          <div>
+            <strong>Web + Mobile</strong>
+            <span>双端阅读体验</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {% if latest %}
+      <section class="latest">
+        <div class="section-head">
+          <div>
+            <p class="section-head__eyebrow">最新归档</p>
+            <h2>{{ latest.title }}</h2>
+          </div>
+          <a class="button button--ghost" href="/articles/{{ latest.slug }}">阅读全文</a>
+        </div>
+        <p class="latest__deck">{{ latest.deck }}</p>
+        <div class="market-strip">
+          {% for item in latest.market_snapshot %}
+            <article class="market-pill">
+              <span>{{ item.name }}</span>
+              <strong>{{ item.close }}</strong>
+              <em>{{ item.change }}</em>
+            </article>
+          {% endfor %}
+        </div>
+        <div class="latest__meta">
+          <span>生成时间：{{ latest.generated_at_et }}</span>
+          <span>统计窗口：{{ latest.window_start_et }} - {{ latest.window_end_et }}</span>
+          {% if latest.audio_url %}
+            <a href="{{ latest.audio_url }}">播放音频</a>
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+
+    <section class="features">
+      <article>
+        <h3>结构化生成</h3>
+        <p>30 条重点新闻均附中文总结、影响分析、发布时间和原文来源链接，支持合并多源信息。</p>
+      </article>
+      <article>
+        <h3>自动化分发</h3>
+        <p>每天美东早上 8 点自动生成并发送邮件，也可随时点击按钮实时更新一版。</p>
+      </article>
+      <article>
+        <h3>长期归档</h3>
+        <p>文章、原始 JSON、播客文稿和音频文件都会按日期保存，便于备查与二次整理。</p>
+      </article>
+    </section>
+
+    <section class="subscribe" id="subscribe">
+      <div class="section-head">
+        <div>
+          <p class="section-head__eyebrow">订阅</p>
+          <h2>免费订阅每日晨报</h2>
+        </div>
+      </div>
+      <form id="subscribe-form" class="subscribe-form">
+        <input name="email" type="email" placeholder="输入你的邮箱地址" required />
+        <button class="button button--primary" type="submit">开始订阅</button>
+      </form>
+      <p class="subscribe__hint" id="subscribe-status">目前免费，提交邮箱后即可加入每日发送列表。</p>
+    </section>
+
+    <section class="archive">
+      <div class="section-head">
+        <div>
+          <p class="section-head__eyebrow">历史归档</p>
+          <h2>按日期整理的文章记录</h2>
+        </div>
+      </div>
+      <div class="archive-grid">
+        {% for article in articles %}
+          <a class="archive-card" href="/articles/{{ article.slug }}">
+            <span>{{ article.generated_date }}</span>
+            <strong>{{ article.title }}</strong>
+            <p>{{ article.deck }}</p>
+          </a>
+        {% else %}
+          <div class="archive-card archive-card--empty">
+            <strong>还没有文章</strong>
+            <p>点击上方按钮生成第一篇日报。</p>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+{% endblock %}

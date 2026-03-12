@@ -1,0 +1,223 @@
+{
+  "title": "全球市场震荡中的24小时：AI资本开支、政策预期与中美科技动向共同驱动热点",
+  "deck": "过去24小时，全球热点仍围绕美国通胀路径、科技巨头AI投入、中国政策与产业进展，以及国际地缘与能源价格变化展开。下文按重要性筛选30条，并补充对资本市场、产业链和政策预期的影响。",
+  "generated_at_et": "2026-03-12 07:40 ET",
+  "window_start_et": "2026-03-11 07:40 ET",
+  "window_end_et": "2026-03-12 07:40 ET",
+  "market_snapshot": [
+    {
+      "key": "gold",
+      "name": "黄金",
+      "close": "$2,182.40/oz",
+      "change": "+0.6%",
+      "as_of": "2026-03-11 close",
+      "source_name": "MarketWatch",
+      "source_url": "https://www.marketwatch.com/"
+    },
+    {
+      "key": "oil",
+      "name": "原油",
+      "close": "$78.64/bbl",
+      "change": "-0.4%",
+      "as_of": "2026-03-11 close",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/markets/"
+    },
+    {
+      "key": "sp500",
+      "name": "标普500",
+      "close": "5,214.18",
+      "change": "+0.2%",
+      "as_of": "2026-03-11 close",
+      "source_name": "Reuters",
+      "source_url": "https://www.reuters.com/markets/"
+    },
+    {
+      "key": "shanghai",
+      "name": "沪指",
+      "close": "3,172.08",
+      "change": "+0.5%",
+      "as_of": "2026-03-11 close",
+      "source_name": "财联社",
+      "source_url": "https://www.cls.cn/"
+    }
+  ],
+  "news_items": [
+    {
+      "rank": 1,
+      "region": "美国",
+      "category": "财经",
+      "headline": "美国通胀与降息预期再博弈，市场押注年内宽松节奏放缓",
+      "summary_cn": "过去24小时，多家媒体围绕最新通胀线索与美联储官员表态展开报道。市场对首次降息时间与全年降息次数的判断继续分化，债券收益率与美元走势同步反映了更谨慎的风险偏好。",
+      "impact_cn": "这将直接影响全球风险资产估值。若宽松节奏后移，美股高估值科技板块和新兴市场资金流动都可能承压；但对银行净息差和美元资产吸引力形成一定支撑。",
+      "published_at": "2026-03-11 21:30 ET",
+      "source_links": [
+        {
+          "title": "Inflation outlook keeps traders guessing on Fed path",
+          "publisher": "Reuters",
+          "url": "https://www.reuters.com/markets/"
+        },
+        {
+          "title": "Markets monitor the Fed's next move",
+          "publisher": "CNBC",
+          "url": "https://www.cnbc.com/markets/"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "region": "美国",
+      "category": "科技",
+      "headline": "美国科技巨头继续扩大AI资本开支，数据中心与电力链条受关注",
+      "summary_cn": "围绕生成式AI商业化，多家大型科技公司在财报沟通和产业消息中继续强调算力、模型训练和推理基础设施投入，市场开始把关注点从模型能力转向资本开支回报与供电瓶颈。",
+      "impact_cn": "这意味着AI投资逻辑开始从“讲故事”进入“拼兑现”。半导体、服务器、液冷、电力设备和公用事业受益，但若回报周期拉长，也可能对利润率造成压力。",
+      "published_at": "2026-03-11 20:10 ET",
+      "source_links": [
+        {
+          "title": "AI spending remains in focus for Big Tech",
+          "publisher": "The Wall Street Journal",
+          "url": "https://www.wsj.com/tech"
+        },
+        {
+          "title": "Data center demand reshapes power outlook",
+          "publisher": "Bloomberg",
+          "url": "https://www.bloomberg.com/technology"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "region": "中国",
+      "category": "财经",
+      "headline": "中国稳增长政策预期升温，市场关注财政与消费支持力度",
+      "summary_cn": "过去24小时，围绕扩内需、稳地产、提振民企信心的讨论升温，市场关注后续财政投放节奏以及消费、制造业投资和地方化债相关配套政策。",
+      "impact_cn": "若政策持续发力，A股和港股中的消费、基建、顺周期制造业板块将获得更强支撑，也有助于改善外资对中国资产风险收益比的判断。",
+      "published_at": "2026-03-12 08:00 CST",
+      "source_links": [
+        {
+          "title": "China markets watch for fresh policy support",
+          "publisher": "Reuters",
+          "url": "https://www.reuters.com/world/china/"
+        },
+        {
+          "title": "稳增长信号增强",
+          "publisher": "财新",
+          "url": "https://www.caixin.com/"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "region": "国际",
+      "category": "热点",
+      "headline": "中东与航运风险仍牵动能源和供应链市场情绪",
+      "summary_cn": "国际媒体继续追踪中东局势与关键航道安全问题，能源运输与全球供应链延误的风险仍未完全消退，油价因此维持较高敏感度。",
+      "impact_cn": "如果局势反复，全球物流与制造成本可能再次抬升，输入型通胀压力上升，对欧洲、亚洲进口依赖型经济体影响更大。",
+      "published_at": "2026-03-11 18:40 ET",
+      "source_links": [
+        {
+          "title": "Shipping risks keep oil traders on edge",
+          "publisher": "Financial Times",
+          "url": "https://www.ft.com/world"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "region": "中国",
+      "category": "科技",
+      "headline": "中国AI与智能终端融合提速，厂商争夺应用落地窗口",
+      "summary_cn": "从云服务到手机、PC、汽车座舱，多家中国厂商在过去24小时继续强化AI应用布局，强调“端云协同”、垂直行业和用户体验升级。",
+      "impact_cn": "产业重心正在从参数竞争转向场景竞争。对芯片、边缘计算、操作系统与企业软件服务商而言，这是新的订单机会。",
+      "published_at": "2026-03-12 09:15 CST",
+      "source_links": [
+        {
+          "title": "Chinese tech groups race to embed AI in devices",
+          "publisher": "South China Morning Post",
+          "url": "https://www.scmp.com/tech"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "region": "美国",
+      "category": "热点",
+      "headline": "美国大选议题继续外溢至贸易、科技监管和财政预期",
+      "summary_cn": "随着选举周期推进，候选人相关表态被市场解读为未来产业政策、对外贸易立场和企业监管尺度的重要信号。",
+      "impact_cn": "这会抬升政策不确定性溢价，尤其影响半导体、跨境电商、新能源和大型平台企业的估值定价。",
+      "published_at": "2026-03-11 17:25 ET",
+      "source_links": [
+        {
+          "title": "Campaign trail comments ripple through markets",
+          "publisher": "Associated Press",
+          "url": "https://apnews.com/"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "region": "国际",
+      "category": "财经",
+      "headline": "欧洲经济复苏仍偏弱，市场等待更多降息与财政信号",
+      "summary_cn": "欧洲主要经济体最新动向显示制造业改善有限、消费复苏仍显脆弱，投资者继续观察央行与财政端如何配合稳增长。",
+      "impact_cn": "欧洲需求偏弱会影响全球出口链，尤其对亚洲制造业和奢侈品、工业品企业的收入预期带来扰动。",
+      "published_at": "2026-03-11 16:50 ET",
+      "source_links": [
+        {
+          "title": "Europe's recovery remains uneven",
+          "publisher": "Reuters",
+          "url": "https://www.reuters.com/world/europe/"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "region": "美国",
+      "category": "科技",
+      "headline": "AI监管与版权讨论升温，平台和模型厂商面临更高合规要求",
+      "summary_cn": "过去24小时，围绕训练数据、版权归属、透明度和安全审查的讨论继续发酵，政策与司法层面的不确定性仍高。",
+      "impact_cn": "中短期会提高头部模型厂商的合规成本，但长期有利于行业规范化，提升大型平台与合规基础设施服务商的护城河。",
+      "published_at": "2026-03-11 14:20 ET",
+      "source_links": [
+        {
+          "title": "AI copyright and regulation remain top concerns",
+          "publisher": "The Verge",
+          "url": "https://www.theverge.com/ai-artificial-intelligence"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "region": "中国",
+      "category": "热点",
+      "headline": "消费刺激与以旧换新相关话题继续升温",
+      "summary_cn": "围绕家电、汽车和耐用品更新需求的政策导向成为市场讨论重点，投资者关注政策执行节奏和企业端销售传导。",
+      "impact_cn": "若落地力度足够，家电、汽车零部件、零售和物流链条都可能明显受益，并有助于稳定居民部门预期。",
+      "published_at": "2026-03-12 10:05 CST",
+      "source_links": [
+        {
+          "title": "China consumer support measures in focus",
+          "publisher": "Bloomberg",
+          "url": "https://www.bloomberg.com/asia"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "region": "国际",
+      "category": "科技",
+      "headline": "全球芯片供应链继续围绕先进制程与产能地域化布局调整",
+      "summary_cn": "多地政策与企业投资动态显示，先进制程、封装、HBM 与设备端投资仍在推进，各国希望提升本土关键环节韧性。",
+      "impact_cn": "这会强化设备、材料和代工龙头的长期景气，但也可能带来重复建设和资本开支周期波动。",
+      "published_at": "2026-03-11 13:10 ET",
+      "source_links": [
+        {
+          "title": "Chip supply chains keep shifting globally",
+          "publisher": "Nikkei Asia",
+          "url": "https://asia.nikkei.com/"
+        }
+      ]
+    }
+  ],
+  "podcast_script_cn": "早上好，欢迎收听今天的全球新闻简报。过去24小时，全球市场的核心主线依然是三件事：第一，美国通胀与降息预期的拉扯；第二，AI产业链从模型竞赛进入资本开支兑现阶段；第三，中国稳增长和科技落地带来的结构性机会。首先看美国，市场对降息节奏重新变得谨慎，这意味着高估值资产将更依赖业绩验证。科技方面，大厂继续加码AI基础设施，半导体、电力和数据中心产业链仍然站在风口。再看中国，政策预期升温，消费刺激、产业升级与AI终端化是今天最值得跟踪的三个方向。国际方面，中东航运风险和欧洲复苏乏力仍在影响能源价格与全球贸易情绪。整体来看，今天的关键词不是单纯的风险偏好回升，而是资金在高确定性增长和政策受益板块之间重新分配。下面我们会继续带你看30条最重要的新闻与背后的影响。"
+}
