@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -24,9 +25,11 @@ scheduler_service = SchedulerService(orchestrator=orchestrator)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
-    scheduler_service.start()
+    if not os.getenv("VERCEL"):
+        scheduler_service.start()
     yield
-    scheduler_service.stop()
+    if not os.getenv("VERCEL"):
+        scheduler_service.stop()
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)

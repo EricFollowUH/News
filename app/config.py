@@ -56,13 +56,23 @@ def _as_bool(value: str | None, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _is_vercel() -> bool:
+    return os.getenv("VERCEL") == "1"
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     project_root = Path(__file__).resolve().parent.parent
     _load_dotenv(project_root / ".env")
 
-    data_dir = project_root / os.getenv("DATA_DIR", "data")
-    database_path = project_root / os.getenv("DATABASE_PATH", "data/app.db")
+    default_data_dir = "/tmp/data" if _is_vercel() else "data"
+    default_database_path = "/tmp/data/app.db" if _is_vercel() else "data/app.db"
+
+    raw_data_dir = os.getenv("DATA_DIR", default_data_dir)
+    raw_database_path = os.getenv("DATABASE_PATH", default_database_path)
+
+    data_dir = Path(raw_data_dir) if Path(raw_data_dir).is_absolute() else project_root / raw_data_dir
+    database_path = Path(raw_database_path) if Path(raw_database_path).is_absolute() else project_root / raw_database_path
 
     article_dir = data_dir / "articles"
     audio_dir = data_dir / "audio"
