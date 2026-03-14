@@ -2,35 +2,68 @@
 {% block title %}{{ settings.app_name }}{% endblock %}
 {% block body %}
   <main class="page-shell">
-    <section class="hero">
+    <section class="hero hero--product">
       <div class="hero__content">
-        <p class="hero__eyebrow">每日新闻摘要</p>
-        <h1>用 OpenAI 生成过去 24 小时全网热点，整理成一篇真正能读完的中文晨报。</h1>
+        <p class="hero__eyebrow">AI News Desk</p>
+        <h1>把过去 24 小时全球最重要的新闻，压缩成一份能直接分发的中文头版。</h1>
         <p class="hero__lede">
-          覆盖美国、中国、国际三大区域，聚焦热点、财经、科技三条主线。支持每日 8:00 美东定时生成、邮件订阅、
-          文章归档和播客式音频同步输出。
+          这不是单纯的新闻聚合页，而是一条完整的内容生产链路：OpenAI 搜索与结构化生成，Vercel 负责前端体验，
+          Supabase 承接数据库与归档存储，支持订阅、归档、播客式音频和随时触发的即时生成。
         </p>
         <div class="hero__actions">
           <button class="button button--primary" id="generate-button" type="button">实时生成当前版本</button>
           <a class="button button--secondary" href="#subscribe">订阅每日邮件</a>
         </div>
-        <p class="hero__note" id="generate-status">点击后会调用 OpenAI 实时生成并归档。</p>
+        <p class="hero__note" id="generate-status">点击后会立刻生成一版新的中文日报，并写入归档。</p>
       </div>
-      <div class="hero__panel">
-        <div class="hero__stats">
-          <div>
-            <strong>30</strong>
-            <span>条重点新闻</span>
-          </div>
-          <div>
-            <strong>08:00 ET</strong>
-            <span>每日定时发送</span>
-          </div>
-          <div>
-            <strong>Web + Mobile</strong>
-            <span>双端阅读体验</span>
-          </div>
+      <div class="hero__panel hero__panel--dashboard">
+        <div class="signal-card">
+          <p>今日编排配置</p>
+          <strong>美国 / 中国 / 国际</strong>
+          <span>热点 / 财经 / 科技 · 共 30 条</span>
         </div>
+        <div class="signal-grid">
+          <article>
+            <strong>08:00 ET</strong>
+            <span>每日固定生成窗口</span>
+          </article>
+          <article>
+            <strong>OpenAI</strong>
+            <span>搜索、摘要、播客语音</span>
+          </article>
+          <article>
+            <strong>Vercel</strong>
+            <span>前端访问与轻量 API</span>
+          </article>
+          <article>
+            <strong>{% if settings.supabase_url %}Supabase 已接入{% else %}Supabase 待接入{% endif %}</strong>
+            <span>数据库与归档存储</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="stack-strip">
+      <div class="stack-strip__header">
+        <p class="section-head__eyebrow">部署架构</p>
+        <h2>Vercel 做前端入口，Supabase 负责内容底座。</h2>
+      </div>
+      <div class="stack-grid">
+        <article class="stack-card">
+          <span class="stack-card__label">Frontend</span>
+          <strong>Vercel</strong>
+          <p>负责 SSR 页面、手动触发生成、订阅入口和移动端访问体验。</p>
+        </article>
+        <article class="stack-card">
+          <span class="stack-card__label">Generation</span>
+          <strong>OpenAI</strong>
+          <p>统一承担新闻搜索、结构化摘要、影响分析与播客式语音生成。</p>
+        </article>
+        <article class="stack-card">
+          <span class="stack-card__label">Backend</span>
+          <strong>Supabase</strong>
+          <p>保存文章元数据、订阅名单和文章/音频归档，适合后续扩展运营后台。</p>
+        </article>
       </div>
     </section>
 
@@ -38,7 +71,7 @@
       <section class="latest">
         <div class="section-head">
           <div>
-            <p class="section-head__eyebrow">最新归档</p>
+            <p class="section-head__eyebrow">Latest Issue</p>
             <h2>{{ latest.title }}</h2>
           </div>
           <a class="button button--ghost" href="/articles/{{ latest.slug }}">阅读全文</a>
@@ -65,24 +98,58 @@
 
     <section class="features">
       <article>
-        <h3>结构化生成</h3>
-        <p>30 条重点新闻均附中文总结、影响分析、发布时间和原文来源链接，支持合并多源信息。</p>
+        <p class="feature__kicker">Editorial</p>
+        <h3>不是信息堆砌，而是编辑部级编排</h3>
+        <p>30 条重点新闻按重要性排序，每条都给出中文总结、影响分析、日期时间和原文来源。</p>
       </article>
       <article>
-        <h3>自动化分发</h3>
-        <p>每天美东早上 8 点自动生成并发送邮件，也可随时点击按钮实时更新一版。</p>
+        <p class="feature__kicker">Distribution</p>
+        <h3>面向订阅与归档的产品设计</h3>
+        <p>同一份内容既能在网页端阅读，也能通过邮件发送，还能沉淀为长期可检索的历史归档。</p>
       </article>
       <article>
-        <h3>长期归档</h3>
-        <p>文章、原始 JSON、播客文稿和音频文件都会按日期保存，便于备查与二次整理。</p>
+        <p class="feature__kicker">Audio</p>
+        <h3>文章与播客脚本同步生成</h3>
+        <p>在文章之外额外输出播客式中文文稿和轻松口吻的语音，适合通勤或晨间收听。</p>
       </article>
+    </section>
+
+    <section class="workflow">
+      <div class="section-head">
+        <div>
+          <p class="section-head__eyebrow">Workflow</p>
+          <h2>生成链路一目了然</h2>
+        </div>
+      </div>
+      <div class="workflow-grid">
+        <article>
+          <span>01</span>
+          <strong>搜索过去 24 小时新闻</strong>
+          <p>自动抓取美国、中国、国际范围内最重要的热点、财经与科技动态。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <strong>输出结构化中文日报</strong>
+          <p>生成标题、导语、30 条重点新闻、经济指标快照与播客式中文脚本。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <strong>写入数据库与存储</strong>
+          <p>文章元数据、订阅信息、JSON 与音频归档统一进入 Supabase 侧的长期存储。</p>
+        </article>
+        <article>
+          <span>04</span>
+          <strong>多端分发与随时调用</strong>
+          <p>网页端实时查看，订阅邮箱接收，运营侧也能按日期追溯历史版本。</p>
+        </article>
+      </div>
     </section>
 
     <section class="subscribe" id="subscribe">
       <div class="section-head">
         <div>
-          <p class="section-head__eyebrow">订阅</p>
-          <h2>免费订阅每日晨报</h2>
+          <p class="section-head__eyebrow">Subscribe</p>
+          <h2>把这份日报直接送到邮箱</h2>
         </div>
       </div>
       <form id="subscribe-form" class="subscribe-form">
@@ -95,8 +162,8 @@
     <section class="archive">
       <div class="section-head">
         <div>
-          <p class="section-head__eyebrow">历史归档</p>
-          <h2>按日期整理的文章记录</h2>
+          <p class="section-head__eyebrow">Archive</p>
+          <h2>按日期归档的历史期刊</h2>
         </div>
       </div>
       <div class="archive-grid">

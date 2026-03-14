@@ -2,13 +2,18 @@
 {% block title %}{{ article.title }}{% endblock %}
 {% block body %}
   <main class="article-page">
-    <div class="article-page__top">
-      <a class="button button--ghost" href="/">返回首页</a>
-      {% if article.audio_url %}
-        <a class="button button--secondary" href="{{ article.audio_url }}">下载音频</a>
-      {% endif %}
-    </div>
-    <article class="article-rich">
+    <section class="article-detail-hero">
+      <div class="article-page__top">
+        <a class="button button--ghost" href="/">返回首页</a>
+        {% if article.audio_url %}
+          <a class="button button--secondary" href="{{ article.audio_url }}">下载音频</a>
+        {% endif %}
+      </div>
+      <p class="section-head__eyebrow">Issue Detail</p>
+      <h1>{{ article.title }}</h1>
+      <p class="article-detail-hero__deck">{{ article.deck }}</p>
+    </section>
+    <article class="article-rich article-rich--detail">
       {{ article_html | safe }}
     </article>
   </main>

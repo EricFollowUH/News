@@ -14,12 +14,12 @@
 
 ## 技术方案
 
-- 后端：FastAPI
-- 定时任务：APScheduler
+- 前端与访问层：Vercel
+- 应用层：FastAPI
 - 模型：OpenAI（网页搜索 + 结构化生成 + TTS）
-- 存储：SQLite + 本地文件归档
+- 后端数据层：Supabase Postgres + Supabase Storage
 - 邮件：SMTP
-- 前端：Jinja2 模板 + 原生 JS + 响应式 CSS
+- 前端渲染：Jinja2 模板 + 原生 JS + 响应式 CSS
 
 ## 目录结构
 
@@ -108,11 +108,11 @@ uvicorn app.main:app --reload
 
 ## 部署建议
 
-推荐第一版架构：
+当前推荐架构：
 
-- 应用与定时任务：Railway
-- 数据库：SQLite
-- 文件归档：Railway Volume
+- 前端与轻量 API：Vercel
+- 数据库：Supabase Postgres
+- 归档文件：Supabase Storage
 
 详细说明见 [docs/deployment.md](/Users/xuyihuan/Library/CloudStorage/OneDrive-Personal/Xu Eric/Personal Document/AI/news/docs/deployment.md)。
 
@@ -124,13 +124,15 @@ uvicorn app.main:app --reload
 - `SMTP_USERNAME=xuyihuanjpjp@gmail.com`
 - `SMTP_PASSWORD=你的 Google App Password`
 - `SMTP_FROM_EMAIL=xuyihuanjpjp@gmail.com`
-- `APP_BASE_URL=Railway 分配给你的公开域名`
-- `DATA_DIR=/data`
-- `DATABASE_PATH=/data/app.db`
+- `APP_BASE_URL=你的 Vercel 域名`
+- `DATABASE_URL=Supabase Postgres 连接串`
+- `SUPABASE_URL=你的 Supabase 项目 URL`
+- `SUPABASE_SERVICE_ROLE_KEY=仅服务端使用`
+- `SUPABASE_STORAGE_BUCKET=daily-news-assets`
 
 ## 注意
 
 - 这台当前工作环境未安装 `node`/`npm`，但本项目不依赖前端构建工具。
 - 这台当前工作环境没有现成安装项目依赖，所以我没有在这里实际启动服务器。
 - Gmail 发信请使用 Google App Password，不要使用邮箱登录密码。
-- 当前仓库已经针对 Railway 单体部署做了配置，适合作为第一版直接上线。
+- Vercel 这边更适合承载页面和轻量 API，定时任务如果要长期稳定跑，后续建议拆到独立 job 或 cron 触发器。
