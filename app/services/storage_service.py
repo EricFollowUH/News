@@ -1,20 +1,26 @@
 from __future__ import annotations
 
+import logging
 import mimetypes
 from pathlib import Path
 
 from app.config import get_settings
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 class StorageService:
     def __init__(self) -> None:
         self._client = None
         if settings.supabase_url and settings.supabase_service_role_key:
-            from supabase import create_client
+            try:
+                from supabase import create_client
 
-            self._client = create_client(settings.supabase_url, settings.supabase_service_role_key)
+                self._client = create_client(settings.supabase_url, settings.supabase_service_role_key)
+            except Exception as exc:
+                logger.warning("Supabase storage client disabled: %s", exc)
+                self._client = None
 
     @property
     def uses_supabase(self) -> bool:
