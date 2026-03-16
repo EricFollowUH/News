@@ -19,16 +19,16 @@ from app.services.scheduler import SchedulerService
 settings = get_settings()
 templates = Jinja2Templates(directory=str(settings.templates_dir))
 orchestrator = ArticleOrchestrator()
-scheduler_service = SchedulerService(orchestrator=orchestrator)
+scheduler_service = None if os.getenv("VERCEL") else SchedulerService(orchestrator=orchestrator)
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
-    if not os.getenv("VERCEL"):
+    if scheduler_service is not None:
         scheduler_service.start()
     yield
-    if not os.getenv("VERCEL"):
+    if scheduler_service is not None:
         scheduler_service.stop()
 
 
