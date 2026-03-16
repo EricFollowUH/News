@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from app.config import get_settings
@@ -100,9 +101,8 @@ JSON schema:
             model=settings.openai_news_model,
             input=prompt,
             tools=[{"type": "web_search"}],
-            text={"format": {"type": "json_object"}},
         )
-        payload = json.loads(response.output_text)
+        payload = self._parse_json_payload(response.output_text)
         return GeneratedArticle.model_validate(payload)
 
     def synthesize_podcast(self, script: str, target_path: Path) -> Path | None:
@@ -133,3 +133,16 @@ JSON schema:
             news_items.append(template)
         payload["news_items"] = news_items[:30]
         return GeneratedArticle.model_validate(payload)
+
+    def _parse_json_payload(self, content: str) -> dict:
+        text = content.strip()
+        if text.startswith("```"):
+            text = re.sub(r"^```(?:json)?\s*", "", text)
+            text = re.sub(r"\s*```$", "", text)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+            if not match:
+                raise
+            return json.loads(match.group(0))

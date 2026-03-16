@@ -64,7 +64,8 @@ def _env(key: str, default: str = "") -> str:
     value = os.getenv(key)
     if value is None:
         return default
-    return value.strip()
+    normalized = value.replace("\\n", "\n")
+    return normalized.strip()
 
 
 @lru_cache(maxsize=1)

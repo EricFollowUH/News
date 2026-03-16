@@ -3,10 +3,12 @@ async function postForm(url, body) {
     method: "POST",
     body,
   });
+  const isJson = response.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await response.json() : null;
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+    throw new Error(payload?.message || `Request failed: ${response.status}`);
   }
-  return response.json();
+  return payload;
 }
 
 const generateButton = document.querySelector("#generate-button");
@@ -21,7 +23,7 @@ if (generateButton) {
       generateStatus.innerHTML = `生成完成，<a href="${data.article_url}">点击查看最新文章</a>。`;
       window.location.href = data.article_url;
     } catch (error) {
-      generateStatus.textContent = "生成失败，请检查 OpenAI API 配置或稍后再试。";
+      generateStatus.textContent = error.message || "生成失败，请稍后再试。";
     } finally {
       generateButton.disabled = false;
     }

@@ -92,7 +92,11 @@ async def article_detail(request: Request, slug: str) -> HTMLResponse:
 
 @app.post("/api/generate-now", response_class=JSONResponse)
 async def generate_now() -> JSONResponse:
-    article = orchestrator.generate_and_archive()
+    try:
+        article = orchestrator.generate_and_archive()
+    except Exception as exc:
+        message = str(exc).strip() or "生成失败，请稍后再试。"
+        return JSONResponse({"ok": False, "message": message}, status_code=500)
     return JSONResponse(
         {
             "ok": True,
