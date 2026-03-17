@@ -15,7 +15,7 @@
 ## 技术方案
 
 - 前端与访问层：Vercel
-- 应用层：FastAPI
+- 应用层：FastAPI（可分别部署为前端入口和生成后端）
 - 模型：Gemini（Google Search + 结构化生成 + TTS）
 - 后端数据层：Supabase Postgres + Supabase Storage
 - 邮件：SMTP
@@ -75,6 +75,10 @@ uvicorn app.main:app --reload
 
 ## 关键环境变量
 
+- `GENERATOR_API_BASE_URL`
+  当前端部署在 Vercel、生成后端部署在 Railway 时，填写 Railway 后端地址，例如 `https://news-generator.up.railway.app`
+- `CORS_ALLOWED_ORIGINS`
+  允许跨域调用生成接口的前端域名列表，逗号分隔
 - `GEMINI_NEWS_MODEL`
   默认 `gemini-3-flash-preview`
 - `GEMINI_TTS_MODEL`
@@ -110,7 +114,8 @@ uvicorn app.main:app --reload
 
 当前推荐架构：
 
-- 前端与轻量 API：Vercel
+- 前端与展示页：Vercel
+- 长任务生成后端：Railway
 - 数据库：Supabase Postgres
 - 归档文件：Supabase Storage
 
@@ -119,6 +124,7 @@ uvicorn app.main:app --reload
 生产环境建议至少配置：
 
 - `GEMINI_API_KEY`
+- `GENERATOR_API_BASE_URL=你的 Railway 域名`
 - `SMTP_HOST=smtp.gmail.com`
 - `SMTP_PORT=587`
 - `SMTP_USERNAME=xuyihuanjpjp@gmail.com`
@@ -129,6 +135,18 @@ uvicorn app.main:app --reload
 - `SUPABASE_URL=你的 Supabase 项目 URL`
 - `SUPABASE_SERVICE_ROLE_KEY=仅服务端使用`
 - `SUPABASE_STORAGE_BUCKET=daily-news-assets`
+
+推荐部署方式：
+
+- Vercel:
+  - `APP_BASE_URL=你的 Vercel 域名`
+  - `GENERATOR_API_BASE_URL=你的 Railway 域名`
+  - 不需要配置定时任务
+- Railway:
+  - `APP_BASE_URL=你的 Vercel 域名`
+  - `CORS_ALLOWED_ORIGINS=你的 Vercel 域名`
+  - 不设置 `GENERATOR_API_BASE_URL`
+  - 保留 Gemini、SMTP、Supabase 全量配置
 
 ## 注意
 

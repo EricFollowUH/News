@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -33,6 +34,13 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=list(settings.cors_allowed_origins) or ["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.mount("/static", StaticFiles(directory=str(settings.static_dir)), name="static")
 app.mount("/data", StaticFiles(directory=str(settings.data_dir)), name="data")
 
@@ -61,6 +69,11 @@ def _article_payload(article: dict | None) -> dict | None:
 async def index(request: Request) -> HTMLResponse:
     latest = _article_payload(get_latest_article())
     articles = list_articles(limit=30)
+    generate_endpoint = (
+        f"{settings.generator_api_base_url}/api/generate-now"
+        if settings.generator_api_base_url
+        else "/api/generate-now"
+    )
     return templates.TemplateResponse(
         "index.html",
         {
@@ -68,6 +81,7 @@ async def index(request: Request) -> HTMLResponse:
             "settings": settings,
             "latest": latest,
             "articles": articles,
+            "generate_endpoint": generate_endpoint,
         },
     )
 

@@ -11,7 +11,7 @@
           Supabase 承接数据库与归档存储，支持订阅、归档、播客式音频和随时触发的即时生成。
         </p>
         <div class="hero__actions">
-          <button class="button button--primary" id="generate-button" type="button">实时生成当前版本</button>
+          <button class="button button--primary" id="generate-button" type="button" data-endpoint="{{ generate_endpoint }}">实时生成当前版本</button>
           <a class="button button--secondary" href="#subscribe">订阅每日邮件</a>
         </div>
         <p class="hero__note" id="generate-status">点击后会立刻生成一版新的中文日报，并写入归档。</p>

@@ -19,7 +19,8 @@ if (generateButton) {
     generateButton.disabled = true;
     generateStatus.textContent = "正在生成文章、播客文稿和音频，请稍候...";
     try {
-      const data = await postForm("/api/generate-now", new FormData());
+      const endpoint = generateButton.dataset.endpoint || "/api/generate-now";
+      const data = await postForm(endpoint, new FormData());
       generateStatus.innerHTML = `生成完成，<a href="${data.article_url}">点击查看最新文章</a>。`;
       window.location.href = data.article_url;
     } catch (error) {

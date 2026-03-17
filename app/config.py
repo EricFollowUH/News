@@ -21,8 +21,10 @@ def _load_dotenv(dotenv_path: Path) -> None:
 class Settings:
     app_name: str
     app_base_url: str
+    generator_api_base_url: str
     app_timezone: str
     app_locale: str
+    cors_allowed_origins: tuple[str, ...]
     secret_key: str
     gemini_api_key: str
     gemini_news_model: str
@@ -90,8 +92,14 @@ def get_settings() -> Settings:
     return Settings(
         app_name=_env("APP_NAME", "Daily News Briefing"),
         app_base_url=_env("APP_BASE_URL", "http://127.0.0.1:8000").rstrip("/"),
+        generator_api_base_url=_env("GENERATOR_API_BASE_URL", "").rstrip("/"),
         app_timezone=_env("APP_TIMEZONE", "America/New_York"),
         app_locale=_env("APP_LOCALE", "zh_CN"),
+        cors_allowed_origins=tuple(
+            origin.strip().rstrip("/")
+            for origin in _env("CORS_ALLOWED_ORIGINS", "http://127.0.0.1:8000,http://localhost:8000").split(",")
+            if origin.strip()
+        ),
         secret_key=_env("SECRET_KEY", "change-me"),
         gemini_api_key=_env("GEMINI_API_KEY", ""),
         gemini_news_model=_env("GEMINI_NEWS_MODEL", "gemini-3-flash-preview"),
