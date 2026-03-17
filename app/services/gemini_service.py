@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import json
 import re
+import wave
 from pathlib import Path
+
+from google.genai import Client, types
 
 from app.config import get_settings
 from app.schemas import GeneratedArticle
@@ -10,13 +13,9 @@ from app.schemas import GeneratedArticle
 settings = get_settings()
 
 
-class OpenAIService:
+class GeminiService:
     def __init__(self) -> None:
-        self._client = None
-        if settings.openai_api_key:
-            from openai import OpenAI
-
-            self._client = OpenAI(api_key=settings.openai_api_key)
+        self._client = Client(api_key=settings.gemini_api_key) if settings.gemini_api_key else None
 
     @property
     def enabled(self) -> bool:
@@ -26,7 +25,7 @@ class OpenAIService:
         if not self.enabled:
             if settings.allow_demo_fallback:
                 return self._load_demo_article()
-            raise RuntimeError("OPENAI_API_KEY is not configured.")
+            raise RuntimeError("GEMINI_API_KEY is not configured.")
 
         prompt = """
 你是一名顶级中文国际新闻总编。请搜索过去24小时的全球热点新闻，
@@ -57,52 +56,21 @@ class OpenAIService:
 9. 所有 url 必须是可点击的原文或权威报道链接。
 10. 必须基于真实过去24小时信息，不要编造。若同主题有多源，请优先 Reuters、Bloomberg、WSJ、CNBC、FT、AP、财新、财联社、新华社等权威来源。
 
-JSON schema:
-{
-  "title": "string",
-  "deck": "string",
-  "generated_at_et": "YYYY-MM-DD HH:mm ET",
-  "window_start_et": "YYYY-MM-DD HH:mm ET",
-  "window_end_et": "YYYY-MM-DD HH:mm ET",
-  "market_snapshot": [
-    {
-      "key": "gold|oil|sp500|shanghai",
-      "name": "string",
-      "close": "string",
-      "change": "string",
-      "as_of": "string",
-      "source_name": "string",
-      "source_url": "https://..."
-    }
-  ],
-  "news_items": [
-    {
-      "rank": 1,
-      "region": "美国|中国|国际",
-      "category": "热点|财经|科技",
-      "headline": "string",
-      "summary_cn": "string",
-      "impact_cn": "string",
-      "published_at": "string",
-      "source_links": [
-        {
-          "title": "string",
-          "publisher": "string",
-          "url": "https://..."
-        }
-      ]
-    }
-  ],
-  "podcast_script_cn": "string"
-}
+请仅返回单个 JSON 对象，不要包含解释文字、代码块或额外前后缀。
 """.strip()
 
-        response = self._client.responses.create(
-            model=settings.openai_news_model,
-            input=prompt,
-            tools=[{"type": "web_search"}],
+        response = self._client.models.generate_content(
+            model=settings.gemini_news_model,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.4,
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                response_mime_type="application/json",
+                response_json_schema=GeneratedArticle.model_json_schema(),
+            ),
         )
-        payload = self._parse_json_payload(response.output_text)
+
+        payload = self._parse_json_payload(response.text or "")
         return GeneratedArticle.model_validate(payload)
 
     def synthesize_podcast(self, script: str, target_path: Path) -> Path | None:
@@ -110,13 +78,38 @@ JSON schema:
             return None
 
         try:
-            speech = self._client.audio.speech.create(
-                model=settings.openai_tts_model,
-                voice=settings.openai_tts_voice,
-                input=script,
-                format="mp3",
+            response = self._client.models.generate_content(
+                model=settings.gemini_tts_model,
+                contents=script,
+                config=types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=types.SpeechConfig(
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                                voice_name=settings.gemini_tts_voice
+                            )
+                        )
+                    ),
+                ),
             )
-            target_path.write_bytes(speech.read())
+
+            audio_bytes = None
+            mime_type = None
+            for candidate in response.candidates or []:
+                parts = candidate.content.parts if candidate.content else []
+                for part in parts:
+                    inline_data = getattr(part, "inline_data", None)
+                    if inline_data and inline_data.data:
+                        audio_bytes = inline_data.data
+                        mime_type = inline_data.mime_type
+                        break
+                if audio_bytes:
+                    break
+
+            if not audio_bytes:
+                return None
+
+            self._write_audio_file(target_path, audio_bytes, mime_type)
             return target_path
         except Exception:
             return None
@@ -146,3 +139,20 @@ JSON schema:
             if not match:
                 raise
             return json.loads(match.group(0))
+
+    def _write_audio_file(self, target_path: Path, audio_bytes: bytes, mime_type: str | None) -> None:
+        if mime_type and mime_type.startswith("audio/L16"):
+            sample_rate = 24000
+            match = re.search(r"rate=(\d+)", mime_type)
+            if match:
+                sample_rate = int(match.group(1))
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            with wave.open(str(target_path), "wb") as wav_file:
+                wav_file.setnchannels(1)
+                wav_file.setsampwidth(2)
+                wav_file.setframerate(sample_rate)
+                wav_file.writeframes(audio_bytes)
+            return
+
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        target_path.write_bytes(audio_bytes)

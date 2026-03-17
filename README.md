@@ -2,7 +2,7 @@
 
 一个完整的中文每日新闻摘要应用，满足这些需求：
 
-- 使用 OpenAI 搜集过去 24 小时美国、中国、国际热点
+- 使用 Gemini 搜集过去 24 小时美国、中国、国际热点
 - 聚焦热点、财经、科技三大板块，共 30 条新闻
 - 每条新闻提供中文总结、影响分析、发布时间和原文来源链接
 - 文章首页展示黄金、原油、标普 500、沪指最近一次收盘指标
@@ -16,7 +16,7 @@
 
 - 前端与访问层：Vercel
 - 应用层：FastAPI
-- 模型：OpenAI（网页搜索 + 结构化生成 + TTS）
+- 模型：Gemini（Google Search + 结构化生成 + TTS）
 - 后端数据层：Supabase Postgres + Supabase Storage
 - 邮件：SMTP
 - 前端渲染：Jinja2 模板 + 原生 JS + 响应式 CSS
@@ -56,7 +56,7 @@ cp .env.example .env
 
 至少需要填写：
 
-- `OPENAI_API_KEY`
+- `GEMINI_API_KEY`
 - `SMTP_HOST`
 - `SMTP_PORT`
 - `SMTP_FROM_EMAIL`
@@ -75,14 +75,14 @@ uvicorn app.main:app --reload
 
 ## 关键环境变量
 
-- `OPENAI_NEWS_MODEL`
-  默认 `gpt-4.1`
-- `OPENAI_TTS_MODEL`
-  默认 `gpt-4o-mini-tts`
-- `OPENAI_TTS_VOICE`
-  默认 `alloy`
+- `GEMINI_NEWS_MODEL`
+  默认 `gemini-3-flash-preview`
+- `GEMINI_TTS_MODEL`
+  默认 `gemini-2.5-flash-preview-tts`
+- `GEMINI_TTS_VOICE`
+  默认 `Aoede`
 - `ALLOW_DEMO_FALLBACK`
-  未配置 OpenAI API Key 时，是否允许使用示例数据跑通页面
+  未配置 Gemini API Key 时，是否允许使用示例数据跑通页面
 - `APP_TIMEZONE`
   默认 `America/New_York`
 - `APP_BASE_URL`
@@ -118,7 +118,7 @@ uvicorn app.main:app --reload
 
 生产环境建议至少配置：
 
-- `OPENAI_API_KEY`
+- `GEMINI_API_KEY`
 - `SMTP_HOST=smtp.gmail.com`
 - `SMTP_PORT=587`
 - `SMTP_USERNAME=xuyihuanjpjp@gmail.com`

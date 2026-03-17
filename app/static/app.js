@@ -23,7 +23,7 @@ if (generateButton) {
       generateStatus.innerHTML = `生成完成，<a href="${data.article_url}">点击查看最新文章</a>。`;
       window.location.href = data.article_url;
     } catch (error) {
-      generateStatus.textContent = error.message || "生成失败，请稍后再试。";
+      generateStatus.textContent = error.message || "生成失败，请检查 Gemini API 配置或稍后再试。";
     } finally {
       generateButton.disabled = false;
     }

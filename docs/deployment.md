@@ -5,17 +5,17 @@
 - Vercel 负责前端页面与轻量 API 入口
 - Supabase Postgres 保存文章与订阅数据
 - Supabase Storage 保存文章归档与音频文件
-- OpenAI 负责新闻搜索、结构化生成与语音
+- Gemini 负责新闻搜索、结构化生成与语音
 
 ## 需要的环境变量
 
 在 Vercel 中至少配置：
 
 ```text
-OPENAI_API_KEY=
-OPENAI_NEWS_MODEL=gpt-4.1
-OPENAI_TTS_MODEL=gpt-4o-mini-tts
-OPENAI_TTS_VOICE=alloy
+GEMINI_API_KEY=
+GEMINI_NEWS_MODEL=gemini-3-flash-preview
+GEMINI_TTS_MODEL=gemini-2.5-flash-preview-tts
+GEMINI_TTS_VOICE=Aoede
 
 APP_BASE_URL=https://你的-vercel-域名
 APP_TIMEZONE=America/New_York

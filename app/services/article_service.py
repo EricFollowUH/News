@@ -10,7 +10,7 @@ from app.config import get_settings
 from app.db import insert_article, list_active_subscriptions, update_article_status
 from app.schemas import GeneratedArticle
 from app.services.email_service import EmailService
-from app.services.openai_service import OpenAIService
+from app.services.gemini_service import GeminiService
 from app.services.storage_service import StorageService, guess_content_type
 
 settings = get_settings()
@@ -26,13 +26,13 @@ def _slugify(text: str) -> str:
 
 class ArticleOrchestrator:
     def __init__(self) -> None:
-        self.openai = OpenAIService()
+        self.gemini = GeminiService()
         self.email = EmailService()
         self.storage = StorageService()
 
     def generate_and_archive(self) -> dict[str, str]:
         now_et = datetime.now(ZoneInfo(settings.app_timezone))
-        article = self.openai.generate_article()
+        article = self.gemini.generate_article()
         slug = f"{now_et.strftime('%Y%m%d-%H%M')}-{_slugify(article.title)}"
 
         article_html = self._render_article_html(article, slug)
@@ -40,7 +40,7 @@ class ArticleOrchestrator:
         article_relative_path = f"articles/{date_prefix}/{slug}.html"
         payload_relative_path = f"articles/{date_prefix}/{slug}.json"
         script_relative_path = f"articles/{date_prefix}/{slug}-podcast.txt"
-        audio_relative_path = f"audio/{date_prefix}/{slug}.mp3"
+        audio_relative_path = f"audio/{date_prefix}/{slug}.wav"
 
         article_path, article_url = self.storage.save_text(
             relative_path=article_relative_path,
@@ -73,9 +73,9 @@ class ArticleOrchestrator:
             payload=article.model_dump(mode="json"),
         )
 
-        local_audio_path = settings.audio_dir / date_prefix / f"{slug}.mp3"
+        local_audio_path = settings.audio_dir / date_prefix / f"{slug}.wav"
         local_audio_path.parent.mkdir(parents=True, exist_ok=True)
-        rendered_audio = self.openai.synthesize_podcast(article.podcast_script_cn, local_audio_path)
+        rendered_audio = self.gemini.synthesize_podcast(article.podcast_script_cn, local_audio_path)
         if rendered_audio:
             audio_path, audio_url = self.storage.save_bytes(
                 relative_path=audio_relative_path,

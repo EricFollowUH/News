@@ -24,10 +24,10 @@ class Settings:
     app_timezone: str
     app_locale: str
     secret_key: str
-    openai_api_key: str
-    openai_news_model: str
-    openai_tts_model: str
-    openai_tts_voice: str
+    gemini_api_key: str
+    gemini_news_model: str
+    gemini_tts_model: str
+    gemini_tts_voice: str
     allow_demo_fallback: bool
     smtp_host: str
     smtp_port: int
@@ -93,10 +93,10 @@ def get_settings() -> Settings:
         app_timezone=_env("APP_TIMEZONE", "America/New_York"),
         app_locale=_env("APP_LOCALE", "zh_CN"),
         secret_key=_env("SECRET_KEY", "change-me"),
-        openai_api_key=_env("OPENAI_API_KEY", ""),
-        openai_news_model=_env("OPENAI_NEWS_MODEL", "gpt-4.1"),
-        openai_tts_model=_env("OPENAI_TTS_MODEL", "gpt-4o-mini-tts"),
-        openai_tts_voice=_env("OPENAI_TTS_VOICE", "alloy"),
+        gemini_api_key=_env("GEMINI_API_KEY", ""),
+        gemini_news_model=_env("GEMINI_NEWS_MODEL", "gemini-3-flash-preview"),
+        gemini_tts_model=_env("GEMINI_TTS_MODEL", "gemini-2.5-flash-preview-tts"),
+        gemini_tts_voice=_env("GEMINI_TTS_VOICE", "Aoede"),
         allow_demo_fallback=_as_bool(os.getenv("ALLOW_DEMO_FALLBACK"), True),
         smtp_host=_env("SMTP_HOST", ""),
         smtp_port=int(_env("SMTP_PORT", "587")),
