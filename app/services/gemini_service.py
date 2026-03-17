@@ -62,12 +62,12 @@ class GeminiService:
         response = self._client.models.generate_content(
             model=settings.gemini_news_model,
             contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.4,
-                tools=[types.Tool(google_search=types.GoogleSearch())],
-                response_mime_type="application/json",
-                response_json_schema=GeneratedArticle.model_json_schema(),
-            ),
+            config={
+                "temperature": 0.4,
+                "tools": [{"google_search": {}}],
+                "response_mime_type": "application/json",
+                "response_json_schema": GeneratedArticle.model_json_schema(),
+            },
         )
 
         payload = self._parse_json_payload(response.text or "")
