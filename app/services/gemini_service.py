@@ -65,14 +65,10 @@ class GeminiService:
             config=types.GenerateContentConfig(
                 temperature=0.4,
                 tools=[types.Tool(google_search=types.GoogleSearch())],
-                response_mime_type="application/json",
-                response_schema=GeneratedArticle,
             ),
         )
 
-        payload = response.parsed or self._parse_json_payload(response.text or "")
-        if isinstance(payload, GeneratedArticle):
-            return payload
+        payload = self._parse_json_payload(response.text or "")
         return GeneratedArticle.model_validate(payload)
 
     def synthesize_podcast(self, script: str, target_path: Path) -> Path | None:
