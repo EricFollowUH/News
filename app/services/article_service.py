@@ -17,7 +17,8 @@ settings = get_settings()
 
 
 def _slugify(text: str) -> str:
-    cleaned = re.sub(r"[^\w\s-]", "", text, flags=re.UNICODE).strip().lower()
+    ascii_text = text.encode("ascii", "ignore").decode("ascii")
+    cleaned = re.sub(r"[^A-Za-z0-9\s-]", "", ascii_text).strip().lower()
     slug = re.sub(r"[-\s]+", "-", cleaned)
     if not slug:
         slug = datetime.now().strftime("%Y%m%d-%H%M%S")
