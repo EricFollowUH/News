@@ -68,7 +68,7 @@ class GeminiService:
             ),
         )
 
-        payload = self._parse_json_payload(response.text or "")
+        payload = self._normalize_payload(self._parse_json_payload(response.text or ""))
         return GeneratedArticle.model_validate(payload)
 
     def synthesize_podcast(self, script: str, target_path: Path) -> Path | None:
@@ -137,6 +137,21 @@ class GeminiService:
             if not match:
                 raise
             return json.loads(match.group(0))
+
+    def _normalize_payload(self, payload: dict) -> dict:
+        market_snapshot = payload.get("market_snapshot")
+        if isinstance(market_snapshot, dict):
+            normalized_market_snapshot = []
+            for key, item in market_snapshot.items():
+                if isinstance(item, dict):
+                    normalized_market_snapshot.append({"key": key, **item})
+            payload["market_snapshot"] = normalized_market_snapshot
+
+        news_items = payload.get("news_items")
+        if isinstance(news_items, dict):
+            payload["news_items"] = list(news_items.values())
+
+        return payload
 
     def _write_audio_file(self, target_path: Path, audio_bytes: bytes, mime_type: str | None) -> None:
         if mime_type and mime_type.startswith("audio/L16"):
