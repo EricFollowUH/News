@@ -139,6 +139,13 @@ class GeminiService:
             return json.loads(match.group(0))
 
     def _normalize_payload(self, payload: dict) -> dict:
+        if "morning_report" in payload and isinstance(payload["morning_report"], dict):
+            payload = payload["morning_report"]
+        elif len(payload) == 1:
+            only_value = next(iter(payload.values()))
+            if isinstance(only_value, dict):
+                payload = only_value
+
         market_snapshot = payload.get("market_snapshot")
         if isinstance(market_snapshot, dict):
             normalized_market_snapshot = []
