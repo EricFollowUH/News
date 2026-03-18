@@ -65,6 +65,7 @@ class GeminiService:
             config=types.GenerateContentConfig(
                 temperature=0.4,
                 tools=[types.Tool(google_search=types.GoogleSearch())],
+                response_mime_type="application/json",
             ),
         )
 
