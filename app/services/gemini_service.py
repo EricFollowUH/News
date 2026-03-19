@@ -147,19 +147,131 @@ class GeminiService:
             if isinstance(only_value, dict):
                 payload = only_value
 
+        self._apply_top_level_aliases(payload)
+
         market_snapshot = payload.get("market_snapshot")
+        if market_snapshot is None:
+            market_snapshot = payload.get("market_indicators") or payload.get("market_quotes")
+            if market_snapshot is not None:
+                payload["market_snapshot"] = market_snapshot
         if isinstance(market_snapshot, dict):
             normalized_market_snapshot = []
             for key, item in market_snapshot.items():
                 if isinstance(item, dict):
                     normalized_market_snapshot.append({"key": key, **item})
             payload["market_snapshot"] = normalized_market_snapshot
+            market_snapshot = payload["market_snapshot"]
+
+        if isinstance(market_snapshot, list):
+            payload["market_snapshot"] = [
+                self._normalize_market_quote(item) for item in market_snapshot if isinstance(item, dict)
+            ]
 
         news_items = payload.get("news_items")
+        if news_items is None:
+            news_items = payload.get("top_stories") or payload.get("stories") or payload.get("items")
+            if news_items is not None:
+                payload["news_items"] = news_items
         if isinstance(news_items, dict):
             payload["news_items"] = list(news_items.values())
+            news_items = payload["news_items"]
+
+        if isinstance(news_items, list):
+            payload["news_items"] = [
+                self._normalize_news_item(item, index + 1) for index, item in enumerate(news_items) if isinstance(item, dict)
+            ]
 
         return payload
+
+    def _apply_top_level_aliases(self, payload: dict) -> None:
+        aliases = {
+            "title": ["report_title", "headline", "report_headline"],
+            "deck": ["report_deck", "intro", "introduction", "summary_deck", "lead"],
+            "generated_at_et": ["generated_time_et", "report_generated_at_et", "generated_at"],
+            "window_start_et": ["time_window_start", "start_time_et", "window_start"],
+            "window_end_et": ["time_window_end", "end_time_et", "window_end"],
+            "podcast_script_cn": ["podcast_script", "podcast_script_zh", "podcast_cn", "audio_script_cn"],
+        }
+
+        for target, candidates in aliases.items():
+            if payload.get(target):
+                continue
+            for candidate in candidates:
+                value = payload.get(candidate)
+                if value not in (None, "", [], {}):
+                    payload[target] = value
+                    break
+
+    def _normalize_market_quote(self, item: dict) -> dict:
+        normalized = dict(item)
+        aliases = {
+            "key": ["symbol", "code"],
+            "name": ["label", "title"],
+            "close": ["close_price", "closing_price", "last_close"],
+            "change": ["change_text", "daily_change", "change_pct"],
+            "as_of": ["timestamp", "published_at", "priced_at"],
+            "source_name": ["publisher", "source", "source_title"],
+            "source_url": ["url", "source_link", "link"],
+        }
+        for target, candidates in aliases.items():
+            if normalized.get(target):
+                continue
+            for candidate in candidates:
+                value = normalized.get(candidate)
+                if isinstance(value, dict):
+                    value = value.get("name") or value.get("publisher") or value.get("url")
+                if value not in (None, "", [], {}):
+                    normalized[target] = value
+                    break
+        return normalized
+
+    def _normalize_news_item(self, item: dict, fallback_rank: int) -> dict:
+        normalized = dict(item)
+        aliases = {
+            "rank": ["order", "id"],
+            "region": ["market", "geography"],
+            "category": ["topic", "section"],
+            "headline": ["title", "news_title"],
+            "summary_cn": ["summary", "summary_zh", "brief_cn"],
+            "impact_cn": ["impact", "analysis", "impact_analysis_cn"],
+            "published_at": ["datetime", "published_time", "time"],
+            "source_links": ["sources", "references", "links"],
+        }
+        for target, candidates in aliases.items():
+            if normalized.get(target):
+                continue
+            for candidate in candidates:
+                value = normalized.get(candidate)
+                if value not in (None, "", [], {}):
+                    normalized[target] = value
+                    break
+
+        normalized["rank"] = normalized.get("rank") or fallback_rank
+
+        source_links = normalized.get("source_links")
+        if isinstance(source_links, dict):
+            source_links = list(source_links.values())
+        if isinstance(source_links, list):
+            normalized["source_links"] = [self._normalize_source_link(link) for link in source_links if isinstance(link, dict)]
+
+        return normalized
+
+    def _normalize_source_link(self, source: dict) -> dict:
+        normalized = dict(source)
+        aliases = {
+            "title": ["headline", "name"],
+            "publisher": ["source", "outlet"],
+            "url": ["link", "source_url"],
+        }
+        for target, candidates in aliases.items():
+            if normalized.get(target):
+                continue
+            for candidate in candidates:
+                value = normalized.get(candidate)
+                if value not in (None, "", [], {}):
+                    normalized[target] = value
+                    break
+        return normalized
 
     def _write_audio_file(self, target_path: Path, audio_bytes: bytes, mime_type: str | None) -> None:
         if mime_type and mime_type.startswith("audio/L16"):
