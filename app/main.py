@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import json
 import os
+import threading
+from datetime import datetime
 from contextlib import asynccontextmanager
 from pathlib import Path
+from uuid import uuid4
 
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +24,8 @@ settings = get_settings()
 templates = Jinja2Templates(directory=str(settings.templates_dir))
 orchestrator = ArticleOrchestrator()
 scheduler_service = None if os.getenv("VERCEL") else SchedulerService(orchestrator=orchestrator)
+generation_jobs: dict[str, dict[str, str | bool | None]] = {}
+generation_jobs_lock = threading.Lock()
 
 
 @asynccontextmanager
@@ -65,6 +70,36 @@ def _article_payload(article: dict | None) -> dict | None:
     return payload
 
 
+def _set_generation_job(job_id: str, **fields: str | bool | None) -> dict[str, str | bool | None]:
+    with generation_jobs_lock:
+        existing = generation_jobs.get(job_id, {}).copy()
+        existing.update(fields)
+        existing["job_id"] = job_id
+        existing["updated_at"] = datetime.now().isoformat()
+        generation_jobs[job_id] = existing
+        return existing
+
+
+def _run_generation_job(job_id: str) -> None:
+    _set_generation_job(job_id, status="running", message="正在生成新闻、播客文稿和音频。")
+    try:
+        article = orchestrator.generate_and_archive()
+    except Exception as exc:
+        message = str(exc).strip() or "生成失败，请稍后再试。"
+        _set_generation_job(job_id, status="failed", ok=False, message=message)
+        return
+
+    _set_generation_job(
+        job_id,
+        status="completed",
+        ok=True,
+        slug=article["slug"],
+        article_url=f"/articles/{article['slug']}",
+        generated_at=article["generated_at"],
+        message="生成完成。",
+    )
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request) -> HTMLResponse:
     latest = _article_payload(get_latest_article())
@@ -106,19 +141,29 @@ async def article_detail(request: Request, slug: str) -> HTMLResponse:
 
 @app.post("/api/generate-now", response_class=JSONResponse)
 async def generate_now() -> JSONResponse:
-    try:
-        article = orchestrator.generate_and_archive()
-    except Exception as exc:
-        message = str(exc).strip() or "生成失败，请稍后再试。"
-        return JSONResponse({"ok": False, "message": message}, status_code=500)
+    job_id = uuid4().hex
+    _set_generation_job(job_id, status="queued", ok=True, message="任务已创建，正在进入生成队列。")
+    thread = threading.Thread(target=_run_generation_job, args=(job_id,), daemon=True)
+    thread.start()
     return JSONResponse(
         {
             "ok": True,
-            "slug": article["slug"],
-            "article_url": f"/articles/{article['slug']}",
-            "generated_at": article["generated_at"],
-        }
+            "queued": True,
+            "job_id": job_id,
+            "status_url": f"/api/generate-status/{job_id}",
+            "message": "任务已提交，正在后台生成。",
+        },
+        status_code=202,
     )
+
+
+@app.get("/api/generate-status/{job_id}", response_class=JSONResponse)
+async def generate_status(job_id: str) -> JSONResponse:
+    with generation_jobs_lock:
+        job = generation_jobs.get(job_id)
+    if not job:
+        return JSONResponse({"ok": False, "message": "任务不存在或已过期。"}, status_code=404)
+    return JSONResponse(job)
 
 
 @app.post("/api/subscribe", response_class=JSONResponse)
