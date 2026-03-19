@@ -101,7 +101,10 @@ class ArticleOrchestrator:
         recipients = list_active_subscriptions()
         article_url = f"{settings.app_base_url}/articles/{slug}"
         print(f"[generate] sending email to {len(recipients)} recipients", flush=True)
-        self.email.send_article(recipients, article.title, article_url, article.deck)
+        try:
+            self.email.send_article(recipients, article.title, article_url, article.deck)
+        except Exception as exc:
+            print(f"[generate] email delivery skipped: {exc}", flush=True)
         print("[generate] pipeline complete", flush=True)
 
         return {
