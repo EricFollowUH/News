@@ -32,8 +32,11 @@ class ArticleOrchestrator:
         self.storage = StorageService()
 
     def generate_and_archive(self) -> dict[str, str]:
+        print("[generate] starting pipeline", flush=True)
         now_et = datetime.now(ZoneInfo(settings.app_timezone))
+        print("[generate] requesting Gemini article", flush=True)
         article = self.gemini.generate_article()
+        print("[generate] article ready", flush=True)
         slug = f"{now_et.strftime('%Y%m%d-%H%M')}-{_slugify(article.title)}"
 
         article_html = self._render_article_html(article, slug)
@@ -43,22 +46,26 @@ class ArticleOrchestrator:
         script_relative_path = f"articles/{date_prefix}/{slug}-podcast.txt"
         audio_relative_path = f"audio/{date_prefix}/{slug}.wav"
 
+        print("[generate] saving article html", flush=True)
         article_path, article_url = self.storage.save_text(
             relative_path=article_relative_path,
             content=article_html,
             content_type="text/html; charset=utf-8",
         )
+        print("[generate] saving article payload", flush=True)
         self.storage.save_text(
             relative_path=payload_relative_path,
             content=article.model_dump_json(indent=2),
             content_type="application/json; charset=utf-8",
         )
+        print("[generate] saving podcast script", flush=True)
         self.storage.save_text(
             relative_path=script_relative_path,
             content=article.podcast_script_cn,
             content_type="text/plain; charset=utf-8",
         )
 
+        print("[generate] inserting article record", flush=True)
         insert_article(
             slug=slug,
             title=article.title,
@@ -76,8 +83,10 @@ class ArticleOrchestrator:
 
         local_audio_path = settings.audio_dir / date_prefix / f"{slug}.wav"
         local_audio_path.parent.mkdir(parents=True, exist_ok=True)
+        print("[generate] synthesizing podcast audio", flush=True)
         rendered_audio = self.gemini.synthesize_podcast(article.podcast_script_cn, local_audio_path)
         if rendered_audio:
+            print("[generate] uploading podcast audio", flush=True)
             audio_path, audio_url = self.storage.save_bytes(
                 relative_path=audio_relative_path,
                 content=rendered_audio.read_bytes(),
@@ -85,11 +94,15 @@ class ArticleOrchestrator:
             )
             update_article_status(slug, "published", audio_path, audio_url)
         else:
+            print("[generate] audio skipped", flush=True)
             update_article_status(slug, "published")
 
+        print("[generate] loading subscriptions", flush=True)
         recipients = list_active_subscriptions()
         article_url = f"{settings.app_base_url}/articles/{slug}"
+        print(f"[generate] sending email to {len(recipients)} recipients", flush=True)
         self.email.send_article(recipients, article.title, article_url, article.deck)
+        print("[generate] pipeline complete", flush=True)
 
         return {
             "slug": slug,
